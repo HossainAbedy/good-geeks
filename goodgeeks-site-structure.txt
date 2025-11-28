@@ -1,0 +1,64 @@
+goodgeeks-site/
+├── package.json
+├── tsconfig.json
+├── next.config.js
+├── public/
+│   ├── favicon.ico
+│   ├── logo/
+│   │   ├── goodgeeks-logo.png
+│   │   ├── jim-it-logo.png
+│   ├── images/
+│   │   ├── hero/
+│   │   │   ├── hero-tech.jpg
+│   │   │   └── hero-devices.png
+│   │   ├── about/
+│   │   │   ├── team-photo.jpg
+│   │   │   └── office.jpg
+│   │   ├── services/
+│   │   │   ├── data-recovery.jpg
+│   │   │   ├── networking.jpg
+│   │   │   ├── security.jpg
+│   │   └── reviews/
+│   │       ├── client1.jpg
+│   │       ├── client2.jpg
+│   │       └── client3.jpg
+│   └── icons/
+│       ├── check.svg
+│       ├── star.svg
+│       └── shield.svg
+│
+├── src/
+│   ├── app/
+│   │   ├── page.tsx
+│   │   ├── layout.tsx
+│   │   ├── globals.css
+│   │   ├── theme-registry.tsx
+│   │   └── api/
+│   │       └── contact/
+│   │           └── route.ts
+│   │
+│   ├── components/
+│   │   ├── Header.tsx
+│   │   ├── Hero.tsx
+│   │   ├── AboutUs.tsx
+│   │   ├── WhyChooseUs.tsx
+│   │   ├── Reviews.tsx
+│   │   ├── ContactBooking.tsx
+│   │   ├── Footer.tsx
+│   │   ├── Services.tsx
+│   │   └── ui/
+│   │       ├── SectionWrapper.tsx
+│   │       └── CardBase.tsx
+│   │
+│   ├── theme/
+│   │   ├── theme.ts
+│   │   ├── tokens.ts
+│   │   └── sx.ts
+│   │
+│   ├── lib/
+│   │   └── mail.ts (optional — if you integrate email)
+│   │
+│   └── utils/
+│       └── validations.ts
+│
+└── README.md
