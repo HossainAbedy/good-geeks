@@ -16,8 +16,8 @@ export async function sendMail({ to, subject, text, html }: MailParams) {
       to,
       from: process.env.SENDGRID_FROM_EMAIL!,
       subject,
-      text,
-      html,
+      text: text || "", // ensure text is string
+      html: html || "", // ensure html is string
     });
   } catch (err) {
     console.error("SendGrid error:", err);
