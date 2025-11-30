@@ -1,6 +1,7 @@
 // src/components/Reviews.tsx
 "use client";
 
+import { useEffect, useState } from "react";
 import {
   Box,
   Container,
@@ -10,26 +11,49 @@ import {
   Rating,
   Stack,
 } from "@mui/material";
+import { createClient } from "@supabase/supabase-js";
 
-const reviews = [
-  {
-    name: "Sarah - Richmond",
-    rating: 5,
-    text: "Quick, friendly and fixed my laptop same day. Highly recommend!",
-  },
-  {
-    name: "Liam - Carlton",
-    rating: 5,
-    text: "Great managed IT support for our cafe — reliable & responsive.",
-  },
-  {
-    name: "Priya - Hawthorn",
-    rating: 4,
-    text: "Good value, technician explained things clearly and fixed my Wi-Fi.",
-  },
-];
+type Review = {
+  id?: string;
+  name: string;
+  rating: number;
+  text: string;
+  suburb?: string;
+  created_at?: string;
+};
+
+// Initialize Supabase client with public anon key
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export default function Reviews() {
+  const [reviews, setReviews] = useState<Review[]>([]);
+
+  useEffect(() => {
+    async function fetchReviews() {
+      try {
+        const { data, error } = await supabase
+          .from("reviews")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(10);
+
+        if (error) {
+          console.error("Error fetching reviews:", error);
+          return;
+        }
+
+        if (data) setReviews(data);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    fetchReviews();
+  }, []);
+
   return (
     <Box
       component="section"
@@ -51,7 +75,6 @@ export default function Reviews() {
           What our customers say
         </Typography>
 
-        {/** Wrapper using Flexbox instead of Grid */}
         <Box
           sx={{
             display: "flex",
@@ -62,7 +85,7 @@ export default function Reviews() {
         >
           {reviews.map((r, i) => (
             <Card
-              key={i}
+              key={r.id ?? i}
               sx={{
                 width: { xs: "100%", sm: "48%", md: "31%" },
                 borderRadius: 4,
@@ -78,7 +101,6 @@ export default function Reviews() {
                 },
               }}
             >
-              {/** Accent bar */}
               <Box
                 sx={{
                   height: 5,
@@ -86,7 +108,6 @@ export default function Reviews() {
                   background: "linear-gradient(135deg, #0046FF, #00C2FF)",
                 }}
               />
-
               <CardContent sx={{ p: 3 }}>
                 <Stack spacing={1.2}>
                   <Rating
@@ -96,7 +117,6 @@ export default function Reviews() {
                     size="small"
                     sx={{ mt: 0.5 }}
                   />
-
                   <Typography
                     variant="subtitle1"
                     sx={{
@@ -105,9 +125,8 @@ export default function Reviews() {
                       color: "#0F172A",
                     }}
                   >
-                    {r.name}
+                    {r.name} {r.suburb ? `— ${r.suburb}` : ""}
                   </Typography>
-
                   <Typography
                     variant="body2"
                     sx={{
@@ -118,6 +137,14 @@ export default function Reviews() {
                   >
                     {r.text}
                   </Typography>
+                  {r.created_at && (
+                    <Typography
+                      variant="caption"
+                      sx={{ color: "text.secondary" }}
+                    >
+                      {new Date(r.created_at).toLocaleDateString()}
+                    </Typography>
+                  )}
                 </Stack>
               </CardContent>
             </Card>

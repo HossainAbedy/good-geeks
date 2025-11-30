@@ -6,7 +6,6 @@ import Image from "next/image";
 import {
   Box,
   Container,
-  Grid,
   Typography,
   TextField,
   Button,
@@ -18,149 +17,245 @@ import {
 } from "@mui/material";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
-import TwitterIcon from "@mui/icons-material/Twitter";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+import PhoneIcon from "@mui/icons-material/Phone";
 
 export default function Footer() {
   const [email, setEmail] = useState("");
-  const [snack, setSnack] = useState({ open: false, message: "", severity: "success" });
+  const [snack, setSnack] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
   const subscribe = async (e) => {
     e.preventDefault();
     if (!email || !email.includes("@")) {
-      setSnack({ open: true, message: "Please enter a valid email", severity: "error" });
+      setSnack({
+        open: true,
+        message: "Please enter a valid email",
+        severity: "error",
+      });
       return;
     }
 
     try {
-      // TODO: implement server handler at /api/subscribe
       await fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
-      setSnack({ open: true, message: "Subscribed — check your inbox", severity: "success" });
+      setSnack({
+        open: true,
+        message: "Subscribed — check your inbox",
+        severity: "success",
+      });
       setEmail("");
     } catch (err) {
-      setSnack({ open: true, message: "Subscription failed. Try again later.", severity: "error" });
+      setSnack({
+        open: true,
+        message: "Subscription failed. Try again later.",
+        severity: "error",
+      });
     }
   };
+
+  const phoneNumber = "+61426542214";
+  const telHref = `tel:${phoneNumber}`;
+  const waHref = "https://wa.me/61426542214";
 
   return (
     <Box component="footer" sx={{ background: "#071022", color: "#E6EEF9", pt: 8, pb: 6 }}>
       <Container maxWidth="lg">
-        <Grid container spacing={4}>
-          {/* About / Logo */}
-          <Grid item xs={12} md={4}>
+        {/* Top section: Flexbox instead of Grid */}
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "space-between",
+            gap: 6,
+          }}
+        >
+          {/* Brand + About */}
+          <Box sx={{ flex: "1 1 280px", minWidth: 280 }}>
             <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
-              <Box sx={{ position: "relative", width: 140, height: 44 }}>
-                <Image src="/logo/goodgeeks-logo.png" alt="GoodGeeks" fill style={{ objectFit: "contain" }} />
+              <Box sx={{ position: "relative", width: 160, height: 48 }}>
+                <Image
+                  src="/logo/goodgeeks-logo.png"
+                  alt="Good Geeks"
+                  fill
+                  style={{ objectFit: "contain" }}
+                />
               </Box>
             </Box>
 
-            <Typography sx={{ color: "rgba(230,238,249,0.9)", mb: 2 }}>
-              GoodGeeks — fast, friendly IT support and repairs. On-site and remote services for homes and small businesses.
+            <Typography sx={{ color: "rgba(230,238,249,0.85)", mb: 3 }}>
+              Friendly, fast and reliable IT support for homes and small businesses
+              across Melbourne. On-site, remote and same-day service available.
             </Typography>
 
             <Stack direction="row" spacing={1}>
-              <IconButton aria-label="Facebook" href="#" size="large" sx={{ color: "inherit" }}>
+              <IconButton href="#" size="large" sx={{ color: "inherit" }}>
                 <FacebookIcon />
               </IconButton>
-              <IconButton aria-label="Instagram" href="#" size="large" sx={{ color: "inherit" }}>
+              <IconButton href="#" size="large" sx={{ color: "inherit" }}>
                 <InstagramIcon />
               </IconButton>
-              <IconButton aria-label="Twitter" href="#" size="large" sx={{ color: "inherit" }}>
-                <TwitterIcon />
-              </IconButton>
-              <IconButton aria-label="LinkedIn" href="#" size="large" sx={{ color: "inherit" }}>
+              <IconButton href="#" size="large" sx={{ color: "inherit" }}>
                 <LinkedInIcon />
               </IconButton>
             </Stack>
-          </Grid>
+          </Box>
 
           {/* Quick Links */}
-          <Grid item xs={6} sm={4} md={2}>
+          <Box sx={{ flex: "1 1 160px", minWidth: 160 }}>
             <Typography variant="h6" sx={{ mb: 1, fontWeight: 800 }}>
               Quick links
             </Typography>
-            <Stack component="nav" spacing={1}>
-              <MuiLink href="/#services" underline="none" color="inherit" onClick={() => window.scrollTo({ top: document.getElementById("services")?.offsetTop - 80 || 0, behavior: "smooth" })}>
+            <Stack spacing={1}>
+              <MuiLink href="/#services" underline="none" color="inherit">
                 Services
               </MuiLink>
-              <MuiLink href="/#about" underline="none" color="inherit" onClick={() => window.scrollTo({ top: document.getElementById("about")?.offsetTop - 80 || 0, behavior: "smooth" })}>
+              <MuiLink href="/#about" underline="none" color="inherit">
                 About
               </MuiLink>
-              <MuiLink href="/#reviews" underline="none" color="inherit" onClick={() => window.scrollTo({ top: document.getElementById("reviews")?.offsetTop - 80 || 0, behavior: "smooth" })}>
+              <MuiLink href="/#reviews" underline="none" color="inherit">
                 Reviews
               </MuiLink>
-              <MuiLink href="/#contact" underline="none" color="inherit" onClick={() => window.scrollTo({ top: document.getElementById("contact")?.offsetTop - 80 || 0, behavior: "smooth" })}>
+              <MuiLink href="/contact" underline="none" color="inherit">
                 Contact
               </MuiLink>
             </Stack>
-          </Grid>
+          </Box>
 
           {/* Contact */}
-          <Grid item xs={6} sm={4} md={3}>
+          <Box sx={{ flex: "1 1 220px", minWidth: 220 }}>
             <Typography variant="h6" sx={{ mb: 1, fontWeight: 800 }}>
               Contact
             </Typography>
-            <Typography sx={{ color: "rgba(230,238,249,0.85)" }}>Phone: <MuiLink href="tel:+61400000000" color="inherit">+61 400 000 000</MuiLink></Typography>
-            <Typography sx={{ color: "rgba(230,238,249,0.85)" }}>Email: <MuiLink href="mailto:hello@goodgeeks.nz" color="inherit">hello@goodgeeks.nz</MuiLink></Typography>
-            <Typography sx={{ mt: 1, color: "rgba(230,238,249,0.7)" }}>Open: Mon–Fri 8:30am – 6pm</Typography>
-          </Grid>
+            <Typography sx={{ color: "rgba(230,238,249,0.85)" }}>
+              Phone: <MuiLink href={telHref} color="inherit">{phoneNumber}</MuiLink>
+            </Typography>
+            <Typography sx={{ color: "rgba(230,238,249,0.85)" }}>
+              WhatsApp: <MuiLink href={waHref} color="inherit" target="_blank" rel="noopener noreferrer">{phoneNumber}</MuiLink>
+            </Typography>
+            <Typography sx={{ color: "rgba(230,238,249,0.85)", mt: 1 }}>
+              Email: <MuiLink href="mailto:hello@goodgeeks.nz" color="inherit">hello@goodgeeks.nz</MuiLink>
+            </Typography>
+            <Typography sx={{ mt: 1, color: "rgba(230,238,249,0.7)" }}>
+              Open: Mon–Sat 8:00am – 7:00pm
+            </Typography>
+
+            <Stack direction="row" spacing={1} sx={{ mt: 2, flexWrap: "wrap" }}>
+              <Button
+                variant="contained"
+                startIcon={<PhoneIcon />}
+                href={telHref}
+                sx={{
+                  backgroundImage: "linear-gradient(90deg,#00C853,#00E676)",
+                  fontWeight: 700,
+                  mb: 1,
+                }}
+              >
+                Call Now
+              </Button>
+              <Button
+                variant="contained"
+                startIcon={<WhatsAppIcon />}
+                href={waHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{
+                  backgroundImage: "linear-gradient(90deg,#00BFA5,#1DE9B6)",
+                  fontWeight: 700,
+                  mb: 1,
+                }}
+              >
+                WhatsApp
+              </Button>
+            </Stack>
+          </Box>
 
           {/* Newsletter */}
-          <Grid item xs={12} md={3}>
+          <Box sx={{ flex: "1 1 240px", minWidth: 240 }}>
             <Typography variant="h6" sx={{ mb: 1, fontWeight: 800 }}>
               Newsletter
             </Typography>
-
             <Typography sx={{ color: "rgba(230,238,249,0.8)", mb: 1 }}>
-              Get tips and offers — no spam. Unsubscribe anytime.
+              Stay updated with tips & offers. No spam, unsubscribe anytime.
             </Typography>
 
-            <Box component="form" onSubmit={subscribe} sx={{ display: "flex", gap: 1, mt: 1 }}>
+            <Box
+              component="form"
+              onSubmit={subscribe}
+              sx={{ display: "flex", gap: 1, mt: 2 }}
+            >
               <TextField
                 variant="filled"
                 size="small"
                 placeholder="Your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                sx={{
-                  background: "rgba(255,255,255,0.03)",
-                  borderRadius: 1,
-                  input: { color: "#E6EEF9" },
-                  "& .MuiFilledInput-root": { background: "rgba(255,255,255,0.03)" },
-                }}
                 InputProps={{ disableUnderline: true }}
                 fullWidth
+                sx={{
+                  background: "rgba(255,255,255,0.06)",
+                  borderRadius: 1,
+                  input: { color: "#E6EEF9" },
+                }}
               />
-              <Button variant="contained" type="submit" sx={{ backgroundImage: "linear-gradient(90deg,#0066FF,#00C4FF)", fontWeight: 800 }}>
-                Subscribe
+              <Button
+                variant="contained"
+                type="submit"
+                sx={{
+                  backgroundImage: "linear-gradient(90deg,#0066FF,#00C4FF)",
+                  fontWeight: 800,
+                  px: 3,
+                }}
+              >
+                Go
               </Button>
             </Box>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
 
-        {/* bottom row */}
-        <Box sx={{ borderTop: "1px solid rgba(255,255,255,0.04)", mt: 6, pt: 4 }}>
-          <Container maxWidth="lg">
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 2, flexWrap: "wrap" }}>
-              <Typography variant="body2" sx={{ color: "rgba(230,238,249,0.7)" }}>
-                © {new Date().getFullYear()} GoodGeeks — All rights reserved.
-              </Typography>
+        {/* Bottom bar */}
+        <Box sx={{ borderTop: "1px solid rgba(255,255,255,0.06)", mt: 6, pt: 3 }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              flexWrap: "wrap",
+              alignItems: "center",
+              gap: 2,
+            }}
+          >
+            <Typography sx={{ color: "rgba(230,238,249,0.7)" }}>
+              © {new Date().getFullYear()} GoodGeeks — All rights reserved.
+            </Typography>
 
-              <Stack direction="row" spacing={2} alignItems="center">
-                <MuiLink href="/privacy-policy" color="inherit" underline="hover">Privacy</MuiLink>
-                <MuiLink href="/terms" color="inherit" underline="hover">Terms</MuiLink>
-              </Stack>
-            </Box>
-          </Container>
+            <Stack direction="row" spacing={2}>
+              <MuiLink href="/privacy-policy" color="inherit" underline="hover">
+                Privacy
+              </MuiLink>
+              <MuiLink href="/terms" color="inherit" underline="hover">
+                Terms
+              </MuiLink>
+            </Stack>
+          </Box>
         </Box>
       </Container>
 
-      <Snackbar open={snack.open} autoHideDuration={4000} onClose={() => setSnack({ ...snack, open: false })}>
-        <Alert severity={snack.severity} onClose={() => setSnack({ ...snack, open: false })}>
+      <Snackbar
+        open={snack.open}
+        autoHideDuration={4000}
+        onClose={() => setSnack({ ...snack, open: false })}
+      >
+        <Alert
+          severity={snack.severity}
+          onClose={() => setSnack({ ...snack, open: false })}
+        >
           {snack.message}
         </Alert>
       </Snackbar>

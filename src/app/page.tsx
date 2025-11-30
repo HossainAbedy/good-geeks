@@ -11,7 +11,7 @@ import Footer from "../components/Footer";
 export default function Home() {
   return (
     <>
-      <Header />
+      {/* <Header /> */}
 
       <section id="hero">
         <Hero />
@@ -37,7 +37,7 @@ export default function Home() {
         <ContactBooking />
       </section>
 
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 }

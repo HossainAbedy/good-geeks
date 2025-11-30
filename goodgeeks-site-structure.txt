@@ -1,27 +1,31 @@
 goodgeeks-site/
 ├── package.json
 ├── tsconfig.json
-├── next.config.js
+├── next.config.ts
+├── .env.local
+├── .gitignore
+├── eslint.config.mjs
+├── README.md
 ├── public/
 │   ├── favicon.ico
 │   ├── logo/
 │   │   ├── goodgeeks-logo.png
-│   │   ├── jim-it-logo.png
+│   │   ├── jim-it-logo.png			#Not yet done
 │   ├── images/
 │   │   ├── hero/
 │   │   │   ├── hero-tech.jpg
-│   │   │   └── hero-devices.png
+│   │   │   └── hero-devices.png		
 │   │   ├── about/
-│   │   │   ├── team-photo.jpg
-│   │   │   └── office.jpg
+│   │   │   ├── team-photo.jpg		#Not yet done
+│   │   │   └── office.jpg			#Not yet done
 │   │   ├── services/
-│   │   │   ├── data-recovery.jpg
-│   │   │   ├── networking.jpg
-│   │   │   ├── security.jpg
+│   │   │   ├── data-recovery.jpg     #Not yet done
+│   │   │   ├── networking.jpg		#Not yet done
+│   │   │   └── security.jpg		    #Not yet done
 │   │   └── reviews/
-│   │       ├── client1.jpg
-│   │       ├── client2.jpg
-│   │       └── client3.jpg
+│   │       ├── client1.jpg 			#Not yet done
+│   │       ├── client2.jpg 			#Not yet done
+│   │       └── client3.jpg 			#Not yet done
 │   └── icons/
 │       ├── check.svg
 │       ├── star.svg
@@ -29,36 +33,49 @@ goodgeeks-site/
 │
 ├── src/
 │   ├── app/
-│   │   ├── page.tsx
-│   │   ├── layout.tsx
+│   │   ├── page.tsx                     # Home page
+│   │   ├── layout.tsx                   # RootLayout with Header/Footer
 │   │   ├── globals.css
 │   │   ├── theme-registry.tsx
+│   │   ├── contact/
+│   │   │   └── page.tsx                 # Uses ContactBooking + Header/Footer
+│   │   ├── newsletter/
+│   │   │   └── page.tsx                 # Newsletter page
+│   │   ├── reviews/
+│   │   │   └── page.tsx                 # Dynamic reviews page
 │   │   └── api/
-│   │       └── contact/
+│   │       ├── contact/
+│   │       │   └── route.ts
+│   │       ├── newsletter/
+│   │       │   └── route.ts
+│   │       ├── reviews/
+│   │       │   └── route.ts
+│   │       └── chat/
 │   │           └── route.ts
-│   │
+│
 │   ├── components/
-│   │   ├── Header.tsx
+│   │   ├── Header.tsx                    # Navigation + WhatsApp button
 │   │   ├── Hero.tsx
 │   │   ├── AboutUs.tsx
 │   │   ├── WhyChooseUs.tsx
-│   │   ├── Reviews.tsx
-│   │   ├── ContactBooking.tsx
-│   │   ├── Footer.tsx
+│   │   ├── Reviews.tsx                   # Static review cards
+│   │   ├── ContactBooking.tsx            # Contact form component
+│   │   ├── Footer.tsx                     # Updated footer with WhatsApp + Melbourne phone
 │   │   ├── Services.tsx
 │   │   └── ui/
-│   │       ├── SectionWrapper.tsx
-│   │       └── CardBase.tsx
-│   │
+│   │       └── WhatsAppButton.tsx
+│
 │   ├── theme/
 │   │   ├── theme.ts
 │   │   ├── tokens.ts
-│   │   └── sx.ts
-│   │
+│   │   
+│
 │   ├── lib/
-│   │   └── mail.ts (optional — if you integrate email)
-│   │
+│   │   └── mail.ts                       # Optional email integration(Not yet done)
+│   │   └── sx.ts
+│
 │   └── utils/
 │       └── validations.ts
-│
-└── README.md
+
+
+Twilio rec->3L84617KAS12FSEJ4MKYMTZW
