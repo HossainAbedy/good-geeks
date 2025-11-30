@@ -51,51 +51,55 @@ export const metadata = {
   }
 };
 
-export default function RootLayout({ children }) {
-  return (
-    <html lang="en" suppressHydrationWarning>
-      <head>
-        {/* Font Optimization */}
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
+export default function RootLayout({
+    children,
+  }: {
+    children: React.ReactNode;
+  }) {
+    return (
+      <html lang="en" suppressHydrationWarning>
+        <head>
+          {/* Font Optimization */}
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
 
-        {/* Local Business Schema (SEO Booster) */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "LocalBusiness",
-              name: "Good Geeks Melbourne",
-              url: "https://goodgeeks.com.au",
-              logo: "https://goodgeeks.com.au/logo.png",
-              image: "https://goodgeeks.com.au/og-image.jpg",
-              telephone: "+61 430 000 000",
-              address: {
-                "@type": "PostalAddress",
-                addressLocality: "Melbourne",
-                addressRegion: "VIC",
-                addressCountry: "Australia"
-              },
-              description:
-                "Professional IT support and computer repair services in Melbourne."
-            })
-          }}
-        />
-      </head>
+          {/* Local Business Schema (SEO Booster) */}
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "LocalBusiness",
+                name: "Good Geeks Melbourne",
+                url: "https://goodgeeks.com.au",
+                logo: "https://goodgeeks.com.au/logo.png",
+                image: "https://goodgeeks.com.au/og-image.jpg",
+                telephone: "+61 430 000 000",
+                address: {
+                  "@type": "PostalAddress",
+                  addressLocality: "Melbourne",
+                  addressRegion: "VIC",
+                  addressCountry: "Australia"
+                },
+                description:
+                  "Professional IT support and computer repair services in Melbourne."
+              })
+            }}
+          />
+        </head>
 
-      <body>
-        <ThemeRegistry>
-          {/* GLOBAL HEADER */}
-          <Header />
+        <body>
+          <ThemeRegistry>
+            {/* GLOBAL HEADER */}
+            <Header />
 
-          {/* PAGE CONTENT */}
-          <main>{children}</main>
+            {/* PAGE CONTENT */}
+            <main>{children}</main>
 
-          {/* GLOBAL FOOTER */}
-          <Footer />
-        </ThemeRegistry>
-      </body>
-    </html>
-  );
-}
+            {/* GLOBAL FOOTER */}
+            <Footer />
+          </ThemeRegistry>
+        </body>
+      </html>
+    );
+  }
