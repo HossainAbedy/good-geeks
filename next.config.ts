@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
   },
 
   // Enable SWC minification for smaller bundle size
-  swcMinify: true,
+  // swcMinify: true,
 
   // Security headers
   async headers() {
