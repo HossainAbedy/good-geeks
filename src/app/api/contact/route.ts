@@ -241,7 +241,11 @@ export async function POST(req: Request) {
 
     let emailResult = { ok: false, reason: "not attempted" as any };
     if (process.env.CONTACT_RECEIVER_EMAIL && process.env.SENDGRID_API_KEY) {
-      emailResult = await sendEmail(subject, html, process.env.CONTACT_RECEIVER_EMAIL);
+      type EmailResult =
+      | { ok: boolean; reason: string }
+      | { ok: boolean; status: number; body: string }
+      | { ok: boolean; error: string };
+      let emailResult: EmailResult = { ok: false, reason: "not attempted" };
     }
 
     const waText = `New Contact\nName: ${name}\nPhone: ${phone}\nEmail: ${email || "-"}\nSuburb: ${suburb || "-"}\nMessage: ${
