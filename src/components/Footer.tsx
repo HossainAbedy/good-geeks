@@ -141,7 +141,7 @@ export default function Footer() {
               WhatsApp: <MuiLink href={waHref} color="inherit" target="_blank" rel="noopener noreferrer">{phoneNumber}</MuiLink>
             </Typography>
             <Typography sx={{ color: "rgba(230,238,249,0.85)", mt: 1 }}>
-              Email: <MuiLink href="mailto:hello@goodgeeks.nz" color="inherit">hello@goodgeeks.nz</MuiLink>
+              Email: <MuiLink href="mailto:contact@goodgeeks.com.au" color="inherit">contact@goodgeeks.com.au</MuiLink>
             </Typography>
             <Typography sx={{ mt: 1, color: "rgba(230,238,249,0.7)" }}>
               Open: Mon–Sat 8:00am – 7:00pm

@@ -1,4 +1,3 @@
-// src/components/Hero.jsx
 "use client";
 
 import React from "react";
@@ -26,6 +25,32 @@ export default function Hero() {
       "0%": { backgroundPosition: "200% 0" },
       "100%": { backgroundPosition: "-200% 0" },
     },
+  };
+
+  // SEO: structured data (LocalBusiness)
+  const ld = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    name: "Good Geeks (Jim's IT Melbourne)",
+    telephone: "+61426542214",
+    description:
+      "Same-day on-site repairs, reliable business IT, secure backups and Wi-Fi installations — backed by a nationwide technician network.",
+    image: "/images/hero/hero-tech.png",
+    logo: "/logo/goodgeeks-logo.png",
+    areaServed: "Melbourne, Australia",
+  };
+
+  // visually-hidden style for accessible H1 (SEO) — won't affect design
+  const srOnly = {
+    position: "absolute",
+    width: 1,
+    height: 1,
+    padding: 0,
+    margin: -1,
+    overflow: "hidden",
+    clip: "rect(0,0,0,0)",
+    whiteSpace: "nowrap",
+    border: 0,
   };
 
   return (
@@ -60,6 +85,11 @@ export default function Hero() {
       />
 
       <Container maxWidth="lg" sx={{ position: "relative", zIndex: 2 }}>
+        {/* Hidden H1 for SEO (matches visible headline) */}
+        <Typography component="h1" sx={srOnly}>
+          Fast, local IT support that simply works
+        </Typography>
+
         <Stack
           direction={{ xs: "column", md: "row" }}
           spacing={{ xs: 4, md: 6 }}
@@ -224,7 +254,7 @@ export default function Hero() {
               <Button
                 variant="outlined"
                 size="large"
-                href="tel:+61400000000"
+                href="tel:+61426542214"
                 startIcon={<PhoneIcon />}
                 sx={{
                   borderColor: "rgba(255,255,255,0.16)",
@@ -239,7 +269,7 @@ export default function Hero() {
                     background: "transparent",
                   },
                 }}
-                aria-label="Call GoodGeeks"
+                aria-label="Call GoodGeeks on +61 426 542 214"
               >
                 Call Now
               </Button>
@@ -282,6 +312,12 @@ export default function Hero() {
           </Box>
         </Stack>
       </Container>
+
+      {/* JSON-LD structured data for LocalBusiness (SEO) */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
+      />
 
       {/* subtle bottom wave */}
       <Box
