@@ -179,8 +179,6 @@ export default function Services() {
                     boxShadow:
                       "0 18px 50px rgba(11,95,255,0.12), inset 0 0 12px rgba(255,255,255,0.65)",
                   },
-                  // keep consistent internal padding & stacking so titles align
-                  display: "flex",
                 }}
               >
                 {/* Top area: fixed box for icon + title (so titles align across cards) */}
