@@ -16,112 +16,117 @@ import {
   ListItemText,
   useTheme,
   useMediaQuery,
-  Fab,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import PhoneIcon from "@mui/icons-material/Phone";
-import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 
-const NAV = [
-  { label: "Home", href: "/", id: "hero" },
+type NavItem = {
+  label: string;
+  href: string;
+  id?: string;
+};
+
+const NAV: NavItem[] = [
+  { label: "Home", href: "/#hero", id: "hero" },
   { label: "Services", href: "/#services", id: "services" },
   { label: "About", href: "/#about", id: "about" },
   { label: "Why Us", href: "/#whychooseus", id: "whychooseus" },
-  { label: "Review", href: "/reviews" },
-  { label: "Newsletter", href: "/newsletter" },
-  { label: "Contact", href: "/contact" },
+  { label: "Reviews", href: "/#reviews", id: "reviews" },
+  { label: "Contact", href: "/#contact", id: "contact" },
 ];
 
-export default function Header() {
+export default function Header(): JSX.Element {
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
   const router = useRouter();
 
-  const [open, setOpen] = useState(false);
-  const [active, setActive] = useState("/");
-  const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen] = useState<boolean>(false);
+  const [active, setActive] = useState<string>("hero");
+  const [scrolled, setScrolled] = useState<boolean>(false);
 
-  // smooth navigation helper: supports hashes (same-page) and page routes
+  // client-only smooth navigation helper (guards window)
   const navigateTo = useCallback(
-    (href) => {
+    (href: string) => {
       setOpen(false);
+
+      if (typeof window === "undefined") {
+        // server fallback: use router push
+        router.push(href);
+        return;
+      }
+
       try {
         const url = new URL(href, window.location.origin);
-        // if same-path + hash -> smooth scroll
-        if (url.hash && (url.pathname === window.location.pathname || url.pathname === "")) {
+        if (url.hash && url.pathname === window.location.pathname) {
           const id = url.hash.replace("#", "");
           const el = document.getElementById(id);
           if (el) {
-            const topOffset = 88; // header offset
+            const topOffset = 80; // header height to offset
             const top = Math.max(el.getBoundingClientRect().top + window.scrollY - topOffset, 0);
             window.scrollTo({ top, behavior: "smooth" });
+            // update URL without jumping
             window.history.replaceState({}, "", url.pathname + url.hash);
-            setActive(id);
             return;
           }
         }
       } catch (err) {
-        // ignore
+        // fallback to router if URL parsing fails
       }
 
-      // otherwise navigate to page route
-      // use router.push for Next App Router
+      // final fallback navigation
       router.push(href);
-      // set active to pathname for highlighting
-      try {
-        const p = new URL(href, window.location.origin).pathname;
-        setActive(p);
-      } catch {
-        setActive(href);
-      }
     },
     [router]
   );
 
-  // shrink header on scroll
+  // shrink header on scroll (client-only)
   useEffect(() => {
+    if (typeof window === "undefined") return;
     const onScroll = () => setScrolled(window.scrollY > 24);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // intersection observer to watch in-page sections (only those NAV entries that have an id)
+  // intersection observer: set active nav item by visible section (client-only)
   useEffect(() => {
-    const ids = NAV.filter((n) => n.id).map((n) => n.id);
+    if (typeof window === "undefined") return;
+
+    const ids = NAV.map((n) => n.id).filter(Boolean) as string[];
     const elements = ids.map((id) => document.getElementById(id)).filter(Boolean);
+
     if (!elements.length) {
-      // set active to current pathname as fallback
-      setActive(window.location.pathname || "/");
+      // no sections found — do nothing
       return;
     }
 
     const observer = new IntersectionObserver(
       (entries) => {
-        // pick the entry with largest intersectionRatio that's intersecting
-        let best = null;
+        // mark the section that is intersecting as active
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            if (!best || entry.intersectionRatio > best.intersectionRatio) best = entry;
+            setActive(entry.target.id);
           }
         });
-        if (best) setActive(best.target.id);
       },
-      { root: null, rootMargin: "-40% 0px -50% 0px", threshold: [0.25, 0.5, 0.75] }
+      {
+        root: null,
+        rootMargin: "-40% 0px -50% 0px",
+        threshold: [0.25, 0.5, 0.75],
+      }
     );
 
     elements.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
   }, []);
 
-  // keyboard for logo -> go home
-  const onLogoKey = (e) => {
-    if (e.key === "Enter" || e.key === " ") navigateTo("/");
+  // keyboard handler for logo
+  const onLogoKey = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      navigateTo("/#hero");
+    }
   };
-
-  // whatsapp link (your number)
-  const whatsappHref = "https://wa.me/61426542214";
 
   return (
     <>
@@ -130,7 +135,7 @@ export default function Header() {
         elevation={scrolled ? 6 : 0}
         sx={{
           transition: "all 240ms ease",
-          background: scrolled ? "rgba(255,255,255,0.95)" : "transparent",
+          background: scrolled ? "rgba(255,255,255,0.9)" : "transparent",
           color: scrolled ? "text.primary" : "common.white",
           backdropFilter: scrolled ? "saturate(140%) blur(6px)" : "blur(2px)",
           borderBottom: scrolled ? "1px solid rgba(10,20,40,0.06)" : "none",
@@ -154,7 +159,7 @@ export default function Header() {
           <Box
             role="link"
             tabIndex={0}
-            onClick={() => navigateTo("/")}
+            onClick={() => navigateTo("/#hero")}
             onKeyDown={onLogoKey}
             sx={{
               display: "flex",
@@ -167,17 +172,14 @@ export default function Header() {
             aria-label="GoodGeeks home"
           >
             <Box sx={{ position: "relative", width: 140, height: scrolled ? 36 : 48 }}>
-              <Image src="/logo/logo.png" alt="GoodGeeks" fill style={{ objectFit: "contain" }} priority />
+              <Image src="/logo/goodgeeks-logo.png" alt="GoodGeeks" fill style={{ objectFit: "contain" }} priority />
             </Box>
           </Box>
 
           {/* Desktop nav */}
           <Box sx={{ display: { xs: "none", md: "flex" }, gap: 1, alignItems: "center", ml: 2 }}>
             {NAV.map((navItem) => {
-              const isBrowser = typeof window !== "undefined";
-              const isActive = navItem.id
-                ? active === navItem.id
-                : active === navItem.href || (isBrowser && active === new URL(navItem.href, window.location.origin).pathname);
+              const isActive = navItem.id ? active === navItem.id : false;
               return (
                 <Button
                   key={navItem.href}
@@ -203,7 +205,7 @@ export default function Header() {
 
             {/* CTA */}
             <Button
-              onClick={() => navigateTo("/contact")}
+              onClick={() => navigateTo("/#contact")}
               variant="contained"
               sx={{
                 ml: 1.5,
@@ -216,13 +218,14 @@ export default function Header() {
               Book Now
             </Button>
 
-            <IconButton component="a" href="tel:+61400000000" aria-label="Call GoodGeeks" size="large" sx={{ ml: 1 }}>
+            <IconButton
+              aria-label="Call GoodGeeks"
+              size="large"
+              component="a"
+              href="tel:+61426542214"
+              sx={{ ml: 1 }}
+            >
               <PhoneIcon />
-            </IconButton>
-
-            {/* WhatsApp quick */}
-            <IconButton component="a" href={whatsappHref} target="_blank" aria-label="WhatsApp GoodGeeks" size="large" sx={{ ml: 1 }}>
-              <WhatsAppIcon />
             </IconButton>
           </Box>
 
@@ -238,7 +241,7 @@ export default function Header() {
         <Box sx={{ p: 2, height: "100%", display: "flex", flexDirection: "column" }}>
           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
             <Box sx={{ position: "relative", width: 140, height: 40 }}>
-              <Image src="/logo/logo.png" alt="GoodGeeks" fill style={{ objectFit: "contain" }} />
+              <Image src="/logo/goodgeeks-logo.png" alt="GoodGeeks" fill style={{ objectFit: "contain" }} />
             </Box>
             <IconButton onClick={() => setOpen(false)} aria-label="Close menu">
               <CloseIcon />
@@ -249,7 +252,10 @@ export default function Header() {
             {NAV.map((navItem) => (
               <ListItemButton
                 key={navItem.href}
+                component="a"
+                href={navItem.href}
                 onClick={() => {
+                  // allow anchor click, but also run navigateTo for special same-page handling
                   navigateTo(navItem.href);
                   setOpen(false);
                 }}
@@ -265,7 +271,7 @@ export default function Header() {
               variant="contained"
               fullWidth
               onClick={() => {
-                navigateTo("/contact");
+                navigateTo("/#contact");
                 setOpen(false);
               }}
               sx={{ borderRadius: 2, py: 1.25, fontWeight: 800 }}
@@ -273,30 +279,17 @@ export default function Header() {
               Book Now
             </Button>
 
-            <IconButton aria-label="Call GoodGeeks" component="a" href="tel:+61400000000" sx={{ ml: 1 }}>
+            <IconButton
+              aria-label="Call GoodGeeks"
+              component="a"
+              href="tel:+61426542214"
+              sx={{ ml: 1 }}
+            >
               <PhoneIcon />
             </IconButton>
           </Box>
         </Box>
       </Drawer>
-
-      {/* Floating WhatsApp FAB */}
-      <Fab
-        color="success"
-        aria-label="WhatsApp"
-        href={whatsappHref}
-        target="_blank"
-        sx={{
-          position: "fixed",
-          right: 20,
-          bottom: 20,
-          zIndex: 1400,
-          backgroundColor: "#25D366",
-          "&:hover": { backgroundColor: "#1DA851" },
-        }}
-      >
-        <WhatsAppIcon />
-      </Fab>
     </>
   );
 }

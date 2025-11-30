@@ -1,4 +1,4 @@
-// src/components/Footer.jsx
+// src/components/Footer.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -21,15 +21,21 @@ import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import PhoneIcon from "@mui/icons-material/Phone";
 
-export default function Footer() {
-  const [email, setEmail] = useState("");
-  const [snack, setSnack] = useState({
+type SnackState = {
+  open: boolean;
+  message: string;
+  severity: "success" | "error";
+};
+
+export default function Footer(): JSX.Element {
+  const [email, setEmail] = useState<string>("");
+  const [snack, setSnack] = useState<SnackState>({
     open: false,
     message: "",
     severity: "success",
   });
 
-  const subscribe = async (e) => {
+  const subscribe = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!email || !email.includes("@")) {
       setSnack({
@@ -81,12 +87,7 @@ export default function Footer() {
           <Box sx={{ flex: "1 1 280px", minWidth: 280 }}>
             <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
               <Box sx={{ position: "relative", width: 160, height: 48 }}>
-                <Image
-                  src="/logo/goodgeeks-logo.png"
-                  alt="Good Geeks"
-                  fill
-                  style={{ objectFit: "contain" }}
-                />
+                <Image src="/logo/goodgeeks-logo.png" alt="Good Geeks" fill style={{ objectFit: "contain" }} />
               </Box>
             </Box>
 
@@ -96,13 +97,13 @@ export default function Footer() {
             </Typography>
 
             <Stack direction="row" spacing={1}>
-              <IconButton href="#" size="large" sx={{ color: "inherit" }}>
+              <IconButton component="a" href="#" size="large" sx={{ color: "inherit" }} aria-label="Facebook">
                 <FacebookIcon />
               </IconButton>
-              <IconButton href="#" size="large" sx={{ color: "inherit" }}>
+              <IconButton component="a" href="#" size="large" sx={{ color: "inherit" }} aria-label="Instagram">
                 <InstagramIcon />
               </IconButton>
-              <IconButton href="#" size="large" sx={{ color: "inherit" }}>
+              <IconButton component="a" href="#" size="large" sx={{ color: "inherit" }} aria-label="LinkedIn">
                 <LinkedInIcon />
               </IconButton>
             </Stack>
@@ -138,10 +139,16 @@ export default function Footer() {
               Phone: <MuiLink href={telHref} color="inherit">{phoneNumber}</MuiLink>
             </Typography>
             <Typography sx={{ color: "rgba(230,238,249,0.85)" }}>
-              WhatsApp: <MuiLink href={waHref} color="inherit" target="_blank" rel="noopener noreferrer">{phoneNumber}</MuiLink>
+              WhatsApp:{" "}
+              <MuiLink href={waHref} color="inherit" target="_blank" rel="noopener noreferrer">
+                {phoneNumber}
+              </MuiLink>
             </Typography>
             <Typography sx={{ color: "rgba(230,238,249,0.85)", mt: 1 }}>
-              Email: <MuiLink href="mailto:contact@goodgeeks.com.au" color="inherit">contact@goodgeeks.com.au</MuiLink>
+              Email:{" "}
+              <MuiLink href="mailto:contact@goodgeeks.com.au" color="inherit">
+                contact@goodgeeks.com.au
+              </MuiLink>
             </Typography>
             <Typography sx={{ mt: 1, color: "rgba(230,238,249,0.7)" }}>
               Open: Mon–Sat 8:00am – 7:00pm
@@ -151,6 +158,7 @@ export default function Footer() {
               <Button
                 variant="contained"
                 startIcon={<PhoneIcon />}
+                component="a"
                 href={telHref}
                 sx={{
                   backgroundImage: "linear-gradient(90deg,#00C853,#00E676)",
@@ -163,6 +171,7 @@ export default function Footer() {
               <Button
                 variant="contained"
                 startIcon={<WhatsAppIcon />}
+                component="a"
                 href={waHref}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -186,11 +195,7 @@ export default function Footer() {
               Stay updated with tips & offers. No spam, unsubscribe anytime.
             </Typography>
 
-            <Box
-              component="form"
-              onSubmit={subscribe}
-              sx={{ display: "flex", gap: 1, mt: 2 }}
-            >
+            <Box component="form" onSubmit={subscribe} sx={{ display: "flex", gap: 1, mt: 2 }}>
               <TextField
                 variant="filled"
                 size="small"
@@ -247,15 +252,8 @@ export default function Footer() {
         </Box>
       </Container>
 
-      <Snackbar
-        open={snack.open}
-        autoHideDuration={4000}
-        onClose={() => setSnack({ ...snack, open: false })}
-      >
-        <Alert
-          severity={snack.severity}
-          onClose={() => setSnack({ ...snack, open: false })}
-        >
+      <Snackbar open={snack.open} autoHideDuration={4000} onClose={() => setSnack({ ...snack, open: false })}>
+        <Alert severity={snack.severity} onClose={() => setSnack({ ...snack, open: false })}>
           {snack.message}
         </Alert>
       </Snackbar>
