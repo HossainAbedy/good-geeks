@@ -36,7 +36,7 @@ const NAV: NavItem[] = [
   { label: "Contact", href: "/#contact", id: "contact" },
 ];
 
-export default function Header(): JSX.Element {
+export default function Heeder() {
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
   const router = useRouter();
@@ -117,7 +117,7 @@ export default function Header(): JSX.Element {
       }
     );
 
-    elements.forEach((el) => observer.observe(el));
+    elements.forEach((el) => observer.observe(el!));
     return () => observer.disconnect();
   }, []);
 
