@@ -1,27 +1,33 @@
 //src/app/api/chat/route.ts
+// /src/app/api/chat/route.ts
 import { NextResponse } from "next/server";
 import Groq from "groq-sdk";
 
 type ChatRequestBody = {
   prompt?: string;
-  messages?: { role: "user" | "assistant" | "system"; content: string }[];
+  messages?: { role: "user" | "system" | "assistant"; content: string }[];
   max_tokens?: number;
 };
 
-const client = new Groq({
-  apiKey: process.env.GROQ_API_KEY!,
-});
-
-const MODEL = process.env.GROQ_MODEL || "llama3-70b-8192";
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
+const MODEL = process.env.GROQ_MODEL || "llama3-8b-8192";
 const MAX_TOKENS = Number(process.env.GROQ_MAX_TOKENS || 500);
+
+if (!GROQ_API_KEY) {
+  console.warn("GROQ_API_KEY is not set.");
+}
+
+const client = new Groq({
+  apiKey: GROQ_API_KEY,
+});
 
 export async function POST(req: Request) {
   try {
-    const body: ChatRequestBody = await req.json();
+    const body: ChatRequestBody = await req.json().catch(() => ({}));
 
-    let messages = [];
+    let messages: { role: "user" | "assistant" | "system"; content: string }[] = [];
 
-    if (body.messages?.length) {
+    if (body.messages && body.messages.length > 0) {
       messages = body.messages;
     } else if (body.prompt) {
       messages = [{ role: "user", content: body.prompt }];
@@ -34,16 +40,20 @@ export async function POST(req: Request) {
 
     const response = await client.chat.completions.create({
       model: MODEL,
-      messages,
+      messages: messages,
       max_tokens: body.max_tokens ?? MAX_TOKENS,
       temperature: 0.2,
     });
 
-    const aiMessage = response.choices?.[0]?.message?.content ?? "";
+    const reply = response?.choices?.[0]?.message?.content || "";
 
-    return NextResponse.json({ ok: true, reply: aiMessage });
+    return NextResponse.json({ OK: true, reply });
   } catch (err: any) {
-    console.error("Chat API error:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    console.error("Groq /api/chat error:", err);
+    return NextResponse.json(
+      { error: err?.message || "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }
+
