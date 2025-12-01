@@ -144,7 +144,7 @@ export default function Footer() {
               </MuiLink>
 
               <MuiLink
-                href="#whychooseus"
+                href="/#whychooseus"
                 underline="none"
                 color="inherit"
                 sx={{
@@ -154,7 +154,7 @@ export default function Footer() {
                   "&:hover": { opacity: 1, color: "primary.main" },
                 }}
               >
-                Why Us
+                Why Us?
               </MuiLink>
 
               <MuiLink
@@ -307,10 +307,9 @@ export default function Footer() {
               gap: 2,
             }}
           >
-            <Typography sx={{ color: "rgba(230,238,249,0.7)" }}>
-              © {new Date().getFullYear()} GoodGeeks — All rights reserved.
-            </Typography>
-
+           <Typography sx={{color:"rgba(230,238,249,0.7)"}}>
+              © {new Date().getFullYear()} GoodGeeks & ABEDY — All rights reserved.
+           </Typography>
             <Stack direction="row" spacing={2}>
               <MuiLink href="/privacy-policy" color="inherit" underline="hover">
                 Privacy

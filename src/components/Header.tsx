@@ -161,27 +161,40 @@ export default function Heeder() {
             gap: 2,
           }}
         >
-          {/* Logo */}
+        {/* Logo */}
+        <Box
+          role="link"
+          tabIndex={0}
+          onClick={() => navigateTo("/#hero")}
+          onKeyDown={onLogoKey}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            cursor: "pointer",
+            textDecoration: "none",
+            outline: "none",
+          }}
+          aria-label="GoodGeeks home"
+        >
           <Box
-            role="link"
-            tabIndex={0}
-            onClick={() => navigateTo("/#hero")}
-            onKeyDown={onLogoKey}
             sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 1,
-              cursor: "pointer",
-              textDecoration: "none",
-              outline: "none",
+              position: "relative",
+              width: scrolled ? 180 : 220,   // BIGGER LOGO
+              height: scrolled ? 55 : 70,    // BIGGER LOGO
+              transition: "all 240ms ease",
+              filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.25))", // NICE SHADOW
             }}
-            aria-label="GoodGeeks home"
           >
-            <Box sx={{ position: "relative", width: 140, height: scrolled ? 36 : 48 }}>
-              <Image src="/logo/goodgeeks-logo.png" alt="GoodGeeks" fill style={{ objectFit: "contain" }} priority />
-            </Box>
+            <Image
+              src="/logo/goodgeeks-logo.png"
+              alt="GoodGeeks"
+              fill
+              style={{ objectFit: "contain" }}
+              priority
+            />
           </Box>
-
+        </Box>
           {/* Desktop nav */}
           <Box sx={{ display: { xs: "none", md: "flex" }, gap: 1, alignItems: "center", ml: 2 }}>
             {NAV.map((navItem) => {
@@ -197,6 +210,8 @@ export default function Heeder() {
                     py: 1,
                     borderRadius: 2,
                     textTransform: "none",
+                    whiteSpace: "nowrap",            // 🔥 prevents text breaking into a new line
+                    minWidth: "fit-content",         // 🔥 prevents shrinking too much
                     ...(isActive && {
                       backgroundImage: "linear-gradient(90deg,#0066FF,#00C4FF)",
                       color: "#fff",

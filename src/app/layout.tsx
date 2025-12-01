@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import ThemeRegistry from "./theme-registry";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import WhatsAppFloating from "@/components/ui/WhatsappFloating";
 
 export const metadata = {
   metadataBase: new URL("https://goodgeeks.com.au"),
@@ -90,6 +91,7 @@ export default function RootLayout({
 
         <body>
           <ThemeRegistry>
+            <WhatsAppFloating  />
             {/* GLOBAL HEADER */}
             <Header />
 
