@@ -114,17 +114,88 @@ export default function Footer() {
             <Typography variant="h6" sx={{ mb: 1, fontWeight: 800 }}>
               Quick links
             </Typography>
-            <Stack spacing={1}>
-              <MuiLink href="/#services" underline="none" color="inherit">
+            <Stack spacing={1.2}>
+              <MuiLink
+                href="/#services"
+                underline="none"
+                color="inherit"
+                sx={{
+                  fontSize: "0.95rem",
+                  opacity: 0.9,
+                  transition: "0.2s",
+                  "&:hover": { opacity: 1, color: "primary.main" },
+                }}
+              >
                 Services
               </MuiLink>
-              <MuiLink href="/#about" underline="none" color="inherit">
+
+              <MuiLink
+                href="/#about"
+                underline="none"
+                color="inherit"
+                sx={{
+                  fontSize: "0.95rem",
+                  opacity: 0.9,
+                  transition: "0.2s",
+                  "&:hover": { opacity: 1, color: "primary.main" },
+                }}
+              >
                 About
               </MuiLink>
-              <MuiLink href="/#reviews" underline="none" color="inherit">
+
+              <MuiLink
+                href="#whychooseus"
+                underline="none"
+                color="inherit"
+                sx={{
+                  fontSize: "0.95rem",
+                  opacity: 0.9,
+                  transition: "0.2s",
+                  "&:hover": { opacity: 1, color: "primary.main" },
+                }}
+              >
+                Why Us
+              </MuiLink>
+
+              <MuiLink
+                href="/reviews"
+                underline="none"
+                color="inherit"
+                sx={{
+                  fontSize: "0.95rem",
+                  opacity: 0.9,
+                  transition: "0.2s",
+                  "&:hover": { opacity: 1, color: "primary.main" },
+                }}
+              >
                 Reviews
               </MuiLink>
-              <MuiLink href="/contact" underline="none" color="inherit">
+
+              <MuiLink
+                href="/newsletter"
+                underline="none"
+                color="inherit"
+                sx={{
+                  fontSize: "0.95rem",
+                  opacity: 0.9,
+                  transition: "0.2s",
+                  "&:hover": { opacity: 1, color: "primary.main" },
+                }}
+              >
+                Newsletter
+              </MuiLink>
+
+              <MuiLink
+                href="/contact"
+                underline="none"
+                color="inherit"
+                sx={{
+                  fontSize: "0.95rem",
+                  opacity: 0.9,
+                  transition: "0.2s",
+                  "&:hover": { opacity: 1, color: "primary.main" },
+                }}
+              >
                 Contact
               </MuiLink>
             </Stack>

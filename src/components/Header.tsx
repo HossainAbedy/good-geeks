@@ -28,12 +28,18 @@ type NavItem = {
 };
 
 const NAV: NavItem[] = [
-  { label: "Home", href: "/#hero", id: "hero" },
+ { label: "Home", href: "/#hero", id: "hero" },
   { label: "Services", href: "/#services", id: "services" },
   { label: "About", href: "/#about", id: "about" },
   { label: "Why Us", href: "/#whychooseus", id: "whychooseus" },
-  { label: "Reviews", href: "/#reviews", id: "reviews" },
-  { label: "Contact", href: "/#contact", id: "contact" },
+
+  // Home page reviews section
+  { label: "Reviews", href: "/#reviews", id: "reviews-section" },
+
+  // Dedicated full page routes
+  { label: "Reviews Page", href: "/reviews", id: "reviews-page" },
+  { label: "Newsletter", href: "/newsletter", id: "newsletter" },
+  { label: "Contact Page", href: "/contact", id: "contact-page" },
 ];
 
 export default function Heeder() {
