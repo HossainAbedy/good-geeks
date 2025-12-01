@@ -234,6 +234,8 @@ export default function Heeder() {
                 px: 3,
                 borderRadius: 2,
                 backgroundImage: "linear-gradient(90deg,#0066FF,#00C4FF)",
+                whiteSpace: "nowrap",
+                minWidth: "fit-content",
               }}
             >
               Book Now

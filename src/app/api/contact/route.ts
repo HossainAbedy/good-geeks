@@ -2,23 +2,27 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
+/**
+ * Supabase client — use PUBLIC URL + service role key (server-only)
+ * Make sure SUPABASE_SERVICE_ROLE_KEY is set in Vercel / environment
+ */
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+  process.env.NEXT_PUBLIC_SUPABASE_URL || "",
+  process.env.SUPABASE_SERVICE_ROLE_KEY || ""
 );
 
 /* -----------------------------
    VALIDATION HELPERS
 ------------------------------ */
 function validateName(name: string) {
-  const v = name.trim();
+  const v = (name || "").trim();
   if (!v) return "Full name is required";
   if (v.length < 2) return "Name is too short";
   return "";
 }
 
 function validatePhone(phone: string) {
-  const raw = phone.trim();
+  const raw = (phone || "").trim();
   if (!raw) return "Phone number is required";
 
   const normalized = raw.replace(/[\s-()]/g, "");
@@ -36,7 +40,7 @@ function validatePhone(phone: string) {
 }
 
 function validateEmail(email: string) {
-  const v = email.trim();
+  const v = (email || "").trim();
   if (!v) return ""; // Optional
   const re = /^\S+@\S+\.\S+$/;
   return re.test(v) ? "" : "Invalid email address";
@@ -44,7 +48,7 @@ function validateEmail(email: string) {
 
 function validateMessage(msg: string) {
   if (!msg) return ""; // Optional
-  if (msg.trim().length < 6) return "Message is too short";
+  if (String(msg).trim().length < 6) return "Message is too short";
   return "";
 }
 
@@ -61,7 +65,9 @@ function escapeHtml(str = "") {
 }
 
 /* -----------------------------
-   SEND EMAIL (SendGrid)
+   SEND EMAIL (SendGrid helper)
+   NOTE: sendEmail must be available in this file's scope.
+   If you moved sendEmail to a shared lib, import it instead.
 ------------------------------ */
 async function sendEmail(subject: string, html: string, to: string) {
   const key = process.env.SENDGRID_API_KEY;
@@ -94,7 +100,8 @@ async function sendEmail(subject: string, html: string, to: string) {
 }
 
 /* -----------------------------
-   SEND WHATSAPP (Twilio first)
+   SEND WHATSAPP (Twilio first, Cloud API fallback)
+   NOTE: returns an object describing the attempt
 ------------------------------ */
 async function sendWhatsAppMessage(text: string) {
   // Twilio
@@ -121,6 +128,7 @@ async function sendWhatsAppMessage(text: string) {
       return { ok: res.ok, provider: "twilio", status: res.status, body: t };
     } catch (err) {
       console.error("Twilio WA error:", err);
+      // fallthrough to next provider
     }
   }
 
@@ -169,11 +177,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Invalid request body" }, { status: 400 });
     }
 
-    const name = (body.name || "").trim();
-    const phone = (body.phone || "").trim();
-    const email = (body.email || "").trim();
-    const suburb = (body.suburb || "").trim();
-    const message = (body.message || "").trim();
+    const name = String(body.name || "").trim();
+    const phone = String(body.phone || "").trim();
+    const email = String(body.email || "").trim();
+    const suburb = String(body.suburb || "").trim();
+    const message = String(body.message || "").trim();
+    const address = body.address ? String(body.address) : null;
+    const lat = typeof body.lat === "number" ? body.lat : null;
+    const lng = typeof body.lng === "number" ? body.lng : null;
 
     /* -----------------------------
        FULL SERVER-SIDE VALIDATION
@@ -193,16 +204,13 @@ export async function POST(req: Request) {
     if (msgErr) errors.message = msgErr;
 
     if (Object.keys(errors).length > 0) {
-      return NextResponse.json(
-        { message: "Validation failed", errors },
-        { status: 422 }
-      );
+      return NextResponse.json({ message: "Validation failed", errors }, { status: 422 });
     }
 
     /* -----------------------------
        SAVE TO SUPABASE
     ------------------------------ */
-    const record = {
+    const record: Record<string, any> = {
       name,
       phone,
       email: email || null,
@@ -211,18 +219,16 @@ export async function POST(req: Request) {
       created_at: new Date().toISOString(),
     };
 
-    const { data, error } = await supabase
-      .from("contacts")
-      .insert([record])
-      .select()
-      .single();
+    // attach optional fields if provided
+    if (address) record.address = address;
+    if (lat !== null) record.lat = lat;
+    if (lng !== null) record.lng = lng;
+
+    const { data, error } = await supabase.from("contacts").insert([record]).select().single();
 
     if (error) {
-      console.error("Supabase insert error:", error);
-      return NextResponse.json(
-        { message: "Failed to save contact" },
-        { status: 500 }
-      );
+      console.error("Supabase insert error (contacts):", error);
+      return NextResponse.json({ message: "Failed to save contact" }, { status: 500 });
     }
 
     /* -----------------------------
@@ -235,24 +241,37 @@ export async function POST(req: Request) {
       <p><strong>Phone:</strong> ${escapeHtml(phone)}</p>
       <p><strong>Email:</strong> ${escapeHtml(email || "-")}</p>
       <p><strong>Suburb:</strong> ${escapeHtml(suburb || "-")}</p>
+      <p><strong>Address:</strong> ${escapeHtml(address || "-")}</p>
       <p><strong>Message:</strong><br/>${escapeHtml(message || "-")}</p>
       <p style="font-size:0.85rem;color:#666">Submitted: ${escapeHtml(new Date().toLocaleString())}</p>
     `;
 
-    let emailResult = { ok: false, reason: "not attempted" as any };
+    // prepare email result placeholder
+    let emailResult: any = { ok: false, reason: "not attempted" };
+
     if (process.env.CONTACT_RECEIVER_EMAIL && process.env.SENDGRID_API_KEY) {
-      type EmailResult =
-      | { ok: boolean; reason: string }
-      | { ok: boolean; status: number; body: string }
-      | { ok: boolean; error: string };
-      let emailResult: EmailResult = { ok: false, reason: "not attempted" };
+      try {
+        emailResult = await sendEmail(subject, html, process.env.CONTACT_RECEIVER_EMAIL);
+        console.log("SendGrid result:", emailResult);
+      } catch (err) {
+        console.error("sendEmail thrown error:", err);
+        emailResult = { ok: false, error: String(err) };
+      }
+    } else {
+      console.log("SendGrid not configured or CONTACT_RECEIVER_EMAIL missing.");
     }
 
-    const waText = `New Contact\nName: ${name}\nPhone: ${phone}\nEmail: ${email || "-"}\nSuburb: ${suburb || "-"}\nMessage: ${
-      message ? message.slice(0, 200) : "-"
-    }`;
-
-    const waResult = await sendWhatsAppMessage(waText);
+    // WhatsApp notification
+    let waResult: any = { ok: false, reason: "not attempted" };
+    try {
+      const waText = `New Contact\nName: ${name}\nPhone: ${phone}\nEmail: ${email || "-"}\nSuburb: ${suburb ||
+        "-"}\nMessage: ${message ? message.slice(0, 200) : "-"}`;
+      waResult = await sendWhatsAppMessage(waText);
+      console.log("WhatsApp result:", waResult);
+    } catch (err) {
+      console.error("sendWhatsAppMessage thrown error:", err);
+      waResult = { ok: false, error: String(err) };
+    }
 
     /* -----------------------------
        SUCCESS RESPONSE

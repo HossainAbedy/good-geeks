@@ -144,7 +144,7 @@ export default function ContactPage() {
       </Container>
 
       {/* MAP (responsive) */}
-      <Box sx={{ px: 2, mb: 6 }}>
+      {/* <Box sx={{ px: 2, mb: 6 }}>
         <Box
           sx={{
             width: "100%",
@@ -164,7 +164,7 @@ export default function ContactPage() {
             title="GoodGeeks service area map - Melbourne"
           />
         </Box>
-      </Box>
+      </Box> */}
 
       {/* CONTACT FORM */}
       <Container maxWidth="lg" sx={{ pb: 12 }}>
