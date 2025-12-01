@@ -1,7 +1,6 @@
-//src/components/ContactBooking.tsx
+// src/components/ContactBooking.tsx
 "use client";
-
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import {
   Box,
   Container,
@@ -21,26 +20,7 @@ import {
 } from "@mui/material";
 import RoomIcon from "@mui/icons-material/Room";
 import MyLocationIcon from "@mui/icons-material/MyLocation";
-
-import "leaflet/dist/leaflet.css";
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
-import L from "leaflet";
-
-/**
- * Fix marker icon paths (Leaflet + webpack/Next.js)
- */
-try {
-  // @ts-ignore
-  delete (L.Icon.Default.prototype as any)._getIconUrl;
-  L.Icon.Default.mergeOptions({
-    iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
-    iconUrl: require("leaflet/dist/images/marker-icon.png"),
-    shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
-  });
-} catch (e) {
-  // ignore in environments where require isn't available at build time
-  // Next.js will handle this client-side.
-}
+import dynamic from "next/dynamic";
 
 /* ---------------------------
    Melbourne suburbs (comprehensive)
@@ -73,24 +53,12 @@ const MELBOURNE_SUBURBS = [
   // This list covers a large number of Melbourne suburbs; add any missing ones if needed.
 ];
 
-/* ---------------------------
-   Component: MapClickHandler
-   - attaches map click handler to set marker and reverse-geocode.
----------------------------- */
-function MapClickHandler({ onMapClick }: { onMapClick: (lat: number, lng: number) => void }) {
-  useMapEvents({
-    click(e) {
-      onMapClick(e.latlng.lat, e.latlng.lng);
-    },
-  });
-  return null;
-}
+const DynamicMapComponent = dynamic(() => import("./ui/DynamicMap"), { ssr: false });
 
 /* ---------------------------
    Main component
 ---------------------------- */
 type Snack = { open: boolean; message: string; severity: "success" | "error" };
-
 export default function ContactBooking() {
   const [form, setForm] = useState({
     name: "",
@@ -102,15 +70,12 @@ export default function ContactBooking() {
     lat: null as number | null,
     lng: null as number | null,
   });
-
   const [errors, setErrors] = useState<Partial<Record<string, string>>>({});
   const [loading, setLoading] = useState(false);
   const [snack, setSnack] = useState<Snack>({ open: false, message: "", severity: "success" });
   const [openModal, setOpenModal] = useState(false);
-
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number }>({ lat: -37.8136, lng: 144.9631 });
   const [mapZoom, setMapZoom] = useState<number>(12);
-
   // validators (same as earlier)
   function validateName(name: string) {
     const v = name.trim();
@@ -139,7 +104,6 @@ export default function ContactBooking() {
     if (msg.trim().length < 6) return "Please provide a bit more detail";
     return "";
   }
-
   function validateAll() {
     const e: Partial<Record<string, string>> = {};
     e.name = validateName(form.name) || undefined;
@@ -153,7 +117,6 @@ export default function ContactBooking() {
     setErrors(e);
     return Object.keys(e).length === 0;
   }
-
   function updateField<K extends keyof typeof form>(key: K, value: any) {
     setForm((s) => ({ ...s, [key]: value }));
     setErrors((prev) => {
@@ -162,7 +125,6 @@ export default function ContactBooking() {
       return copy;
     });
   }
-
   // reverse geocode via Nominatim
   async function reverseGeocode(lat: number, lng: number) {
     try {
@@ -185,7 +147,6 @@ export default function ContactBooking() {
       return null;
     }
   }
-
   // map click handler
   const onMapClick = useCallback(
     async (lat: number, lng: number) => {
@@ -201,7 +162,6 @@ export default function ContactBooking() {
     },
     []
   );
-
   // Use user's current location
   async function handleLocationFetch() {
     if (!navigator.geolocation) {
@@ -231,7 +191,6 @@ export default function ContactBooking() {
       { enableHighAccuracy: true, timeout: 10000 }
     );
   }
-
   // Submit form, including address/lat/lng
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -251,13 +210,11 @@ export default function ContactBooking() {
         lat: form.lat,
         lng: form.lng,
       };
-
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-
       if (res.ok) {
         setForm({ name: "", phone: "", email: "", suburb: "", message: "", address: "", lat: null, lng: null });
         setSnack({ open: true, message: "Thanks! We'll contact you shortly.", severity: "success" });
@@ -276,11 +233,9 @@ export default function ContactBooking() {
       setLoading(false);
     }
   }
-
   // Quick helper for whether submit should be enabled
   const isFormValidForButton = () =>
     !validateName(form.name) && !validatePhone(form.phone) && !validateEmail(form.email) && !validateMessage(form.message) && !!form.suburb;
-
   // small visually hidden
   const srOnly: React.CSSProperties = {
     position: "absolute",
@@ -293,7 +248,6 @@ export default function ContactBooking() {
     whiteSpace: "nowrap",
     border: 0,
   };
-
   // If map tiles fail, show message
   // Render
   return (
@@ -302,11 +256,9 @@ export default function ContactBooking() {
         <Typography component="h2" id="contact-heading" sx={srOnly}>
           Contact Good Geeks — Book an on-site visit or ask a question
         </Typography>
-
         <Typography variant="h4" sx={{ fontWeight: 700, mb: 3 }}>
           Contact & Booking
         </Typography>
-
         <Stack component="form" onSubmit={submit} spacing={2} direction={{ xs: "column", md: "row" }}>
           {/* left form */}
           <Stack spacing={2} sx={{ flex: "1 1 420px", maxWidth: 700 }}>
@@ -319,7 +271,6 @@ export default function ContactBooking() {
               error={Boolean(errors.name)}
               helperText={errors.name}
             />
-
             <TextField
               required
               label="Phone"
@@ -329,7 +280,6 @@ export default function ContactBooking() {
               error={Boolean(errors.phone)}
               helperText={errors.phone || "We may call or message this number"}
             />
-
             <TextField
               label="Email (optional)"
               value={form.email}
@@ -338,7 +288,6 @@ export default function ContactBooking() {
               error={Boolean(errors.email)}
               helperText={errors.email}
             />
-
             {/* suburb autocomplete + use my location button */}
             <Stack direction="row" spacing={1} alignItems="center">
               <MUIAutocomplete
@@ -353,7 +302,6 @@ export default function ContactBooking() {
                 <MyLocationIcon />
               </IconButton>
             </Stack>
-
             <TextField
               label="Short message / problem"
               multiline
@@ -364,44 +312,36 @@ export default function ContactBooking() {
               error={Boolean(errors.message)}
               helperText={errors.message}
             />
-
             <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
               <Button variant="contained" type="submit" disabled={loading || !isFormValidForButton()}>
                 {loading ? <CircularProgress size={20} /> : "Request Visit"}
               </Button>
-
               <Button variant="outlined" href="https://calendly.com/YOUR_CALENDLY_LINK" target="_blank">
                 Book Online
               </Button>
             </Stack>
           </Stack>
-
           {/* right map */}
           <Box sx={{ flex: "1 1 420px", width: "100%", minHeight: 360 }}>
             <Box sx={{ height: 360, width: "100%", borderRadius: 2, overflow: "hidden", boxShadow: "0 10px 30px rgba(2,8,23,0.12)" }}>
-              <MapContainer center={[mapCenter.lat, mapCenter.lng]} zoom={mapZoom} style={{ height: "100%", width: "100%" }}>
-                <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                <MapClickHandler onMapClick={onMapClick} />
-                {form.lat && form.lng && <Marker position={[form.lat, form.lng]} />}
-              </MapContainer>
+              <DynamicMapComponent
+                center={[mapCenter.lat, mapCenter.lng]}
+                zoom={mapZoom}
+                onMapClick={onMapClick}
+                markerPosition={form.lat && form.lng ? [form.lat, form.lng] : null}
+              />
             </Box>
-
             <Typography sx={{ mt: 1, fontSize: 13, color: "text.secondary" }}>
               {form.address ? `Address: ${form.address}` : "Tip: click the map or use your location to auto-fill suburb"}
             </Typography>
           </Box>
         </Stack>
-
         {/* snack */}
         <Snackbar open={snack.open} autoHideDuration={4000} onClose={() => setSnack({ ...snack, open: false })}>
           <Alert severity={snack.severity} onClose={() => setSnack({ ...snack, open: false })}>
             {snack.message}
           </Alert>
         </Snackbar>
-
         {/* modal */}
         <Dialog open={openModal} onClose={() => setOpenModal(false)}>
           <DialogTitle>Message Sent</DialogTitle>
@@ -412,7 +352,6 @@ export default function ContactBooking() {
             <Button onClick={() => setOpenModal(false)}>Close</Button>
           </DialogActions>
         </Dialog>
-
         {/* structured data */}
         <script
           type="application/ld+json"
