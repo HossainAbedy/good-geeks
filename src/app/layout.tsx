@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import ThemeRegistry from "./theme-registry";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import AIFloating from "@/components/ui/AIFloating";
 import WhatsAppFloating from "@/components/ui/WhatsappFloating";
 
 export const metadata = {
@@ -91,6 +92,7 @@ export default function RootLayout({
 
         <body>
           <ThemeRegistry>
+            <AIFloating />
             <WhatsAppFloating  />
             {/* GLOBAL HEADER */}
             <Header />
