@@ -1,66 +1,49 @@
 //src/app/api/chat/route.ts
 import { NextResponse } from "next/server";
-import OpenAI from "openai";
-import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
+import Groq from "groq-sdk";
 
 type ChatRequestBody = {
   prompt?: string;
-  messages?: { role: "user" | "system" | "assistant"; content: string }[];
+  messages?: { role: "user" | "assistant" | "system"; content: string }[];
   max_tokens?: number;
 };
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
-const OPENAI_MAX_TOKENS = Number(process.env.OPENAI_MAX_TOKENS || 500);
-
-// Warn if missing key
-if (!OPENAI_API_KEY) {
-  console.warn("⚠️ OPENAI_API_KEY is not set. /api/chat will fail until configured.");
-}
-
-const client = new OpenAI({
-  apiKey: OPENAI_API_KEY,
+const client = new Groq({
+  apiKey: process.env.GROQ_API_KEY!,
 });
+
+const MODEL = process.env.GROQ_MODEL || "llama3-70b-8192";
+const MAX_TOKENS = Number(process.env.GROQ_MAX_TOKENS || 500);
 
 export async function POST(req: Request) {
   try {
-    const body: ChatRequestBody = (await req.json().catch(() => ({}))) || {};
+    const body: ChatRequestBody = await req.json();
 
-    // Initialize correct message type
-    let messages: ChatCompletionMessageParam[] = [];
+    let messages = [];
 
-    // Use full chat history if provided
-    if (body.messages && Array.isArray(body.messages) && body.messages.length > 0) {
-      messages = body.messages.map((m) => ({
-        role: m.role,
-        content: m.content,
-      }));
-    }
-    // Or use simple prompt
-    else if (body.prompt && typeof body.prompt === "string") {
-      messages = [
-        {
-          role: "user",
-          content: body.prompt,
-        },
-      ];
+    if (body.messages?.length) {
+      messages = body.messages;
+    } else if (body.prompt) {
+      messages = [{ role: "user", content: body.prompt }];
     } else {
-      return NextResponse.json({ error: "No prompt or messages provided" }, { status: 400 });
+      return NextResponse.json(
+        { error: "No prompt or messages provided" },
+        { status: 400 }
+      );
     }
 
-    // Call OpenAI Chat Completion
-    const resp = await client.chat.completions.create({
-      model: OPENAI_MODEL,
+    const response = await client.chat.completions.create({
+      model: MODEL,
       messages,
-      max_tokens: body.max_tokens ?? OPENAI_MAX_TOKENS,
+      max_tokens: body.max_tokens ?? MAX_TOKENS,
       temperature: 0.2,
     });
 
-    const reply = resp.choices?.[0]?.message?.content || "";
+    const aiMessage = response.choices?.[0]?.message?.content ?? "";
 
-    return NextResponse.json({ ok: true, reply }, { status: 200 });
+    return NextResponse.json({ ok: true, reply: aiMessage });
   } catch (err: any) {
-    console.error("❌ /api/chat error:", err);
-    return NextResponse.json({ error: err?.message || "Internal Server Error" }, { status: 500 });
+    console.error("Chat API error:", err);
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
